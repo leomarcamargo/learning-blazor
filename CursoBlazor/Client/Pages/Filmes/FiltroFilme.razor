@@ -1,0 +1,103 @@
+﻿@page "/filme/pesquisar"
+@inject IRepository Repository
+
+<h3>Pesquisar filme</h3>
+<hr />
+<div class="row">
+    <div class="col-md-12">
+        <div class="form-row">
+            <div class="form-group mb-2 col">
+                <label for="Titulo" class="sr-only">Título</label>
+                <input @bind-value="_titulo" @bind-value:event="oninput" @onkeypress="@((KeyboardEventArgs e) => TituloKeyPress(e))"
+                       type="text" class="form-control" id="Titulo " placeholder="Título do Filme" />
+            </div>
+
+            <div class="form-group mx-sm-3 mb-2 col">
+                <select class="form-control" @bind="_generoSelecionado">
+                    <option value="0">Selecione um gênero</option>
+                    @foreach (var item in _generos)
+                    {
+                        <option value="@item.Id">@item.Nome</option>
+                    }
+                </select>
+            </div>
+
+            <div class="form-group mx-sm-3 mb-2 col-auto">
+                <input type="checkbox" class="form-check-input" id="Estreias" @bind="_proximasEstreias" />
+                <label class="form-check-label" for="Estreias">
+                    Próximas Estréias
+                </label>
+            </div>
+
+            <div class="form-group mx-sm-3 mb-2 col-auto">
+                <input type="checkbox" class="form-check-input" id="EmCartaz" @bind="_emCartaz" />
+                <label class="form-check-label" for="EmCartaz">
+                    Em Cartaz
+                </label>
+            </div>
+
+            <div class="form-group mx-sm-3 mb-2 col-auto">
+                <input type="checkbox" class="form-check-input" id="MaisVotadas" @bind="_maisVontadas" />
+                <label class="form-check-label" for="MaisVotadas">
+                    Mais Votadas
+                </label>
+            </div>
+
+            <div class="col-auto">
+                <button type="button" class="btn btn-primary mb-2 mx-sm-1" @onclick="CarregarFilmes">Pesquisar</button>
+                <button type="button" class="btn btn-danger mb-2" @onclick="Limpar">Limpar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-3">
+    <div class="col-md-12">
+        <ListaFilmes Filmes="_filmes"/>
+    </div>
+</div>
+
+@code {
+    private List<Filme> _filmes;
+
+    string _titulo = string.Empty;
+    string _generoSelecionado = "0";
+    private bool _proximasEstreias;
+    private bool _emCartaz;
+    private bool _maisVontadas;
+    private readonly List<Genero> _generos = new List<Genero>();
+
+    protected override void OnInitialized()
+    {
+        _filmes = Repository.ObterFilmes();
+    }
+
+    private void TituloKeyPress(KeyboardEventArgs e)
+    {
+        if (e.Key == "Enter")
+        {
+            CarregarFilmes();
+        }
+    }
+
+    private void CarregarFilmes()
+    {
+        _filmes = _filmes.Where(f => f.Titulo.ToLower().Contains(_titulo.ToLower())).ToList();
+        Console.WriteLine($"titulo:{_titulo}");
+        Console.WriteLine($"generoSelecionado:{_generoSelecionado}");
+        Console.WriteLine($"proximasEstreias:{_proximasEstreias}");
+        Console.WriteLine($"emCartaz:{_emCartaz}");
+        Console.WriteLine($"maisVontadas:{_maisVontadas}");
+    }
+
+
+    private void Limpar()
+    {
+        _filmes = Repository.ObterFilmes();
+        _titulo = string.Empty;
+        _generoSelecionado = "0";
+        _proximasEstreias = false;
+        _emCartaz = false;
+        _maisVontadas = false;
+    }
+}

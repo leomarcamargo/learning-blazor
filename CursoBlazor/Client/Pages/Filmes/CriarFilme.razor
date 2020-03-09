@@ -1,0 +1,45 @@
+﻿@page "/filme/criar"
+@inject NavigationManager NavigationManager
+@inject IRepository Repository
+@inject IMostrarMensagem MostrarMensagem
+
+<h3>Novo Filme</h3>
+<hr />
+
+@if (MostrarFormulario)
+{
+    <FormularioFilme OnValidSubmit="Cadastrar" Filme="_filme" GenerosNaoSelecionados="_generosNaoSelecionados" />
+}
+else
+{
+    @: <p class="text-center">Carregando</p>
+}
+
+@code {
+    private bool MostrarFormulario { get; set; }
+
+    private readonly Filme _filme = new Filme();
+    private List<Genero> _generosNaoSelecionados = new List<Genero>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        var responseHttp = await Repository.Get<List<Genero>>("api/genero");
+        _generosNaoSelecionados = responseHttp.Response;
+        MostrarFormulario = true;
+    }
+
+    private async Task Cadastrar()
+    {
+        var httpResponse = await Repository.Post<Filme, int>("api/filme", _filme);
+        if (httpResponse.Error)
+        {
+            var mensagemErro = await httpResponse.GetBody();
+            await MostrarMensagem.MostrarMensagemErro(mensagemErro);
+        }
+        else
+        {
+            var idPelicula = httpResponse.Response;
+            NavigationManager.NavigateTo($"/filme/{idPelicula}/{_filme.Titulo.Replace(" ", "-")}");
+        }
+    }
+}

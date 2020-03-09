@@ -1,0 +1,84 @@
+﻿@page "/filme/{Id:int}"
+@page "/filme/{Id:int}/{Titulo}"
+@inject IRepository Repository
+@inject NavigationManager NavigationManager
+@inject IMostrarMensagem MostrarMensagem
+
+@if (_model == null)
+{
+    <p class="text-center">Carregando</p>
+}
+else
+{
+    <h2>@_model.Filme.Titulo (@_model.Filme.DataLancamento?.ToString("yyyy"))</h2>
+    for (int i = 0; i < _model.Generos.Count; i++)
+    {
+        if (i < _model.Generos.Count - 1)
+        {
+            @_linkGenero(_model.Generos[i])<text>, </text>
+        }
+        else
+        {
+            @_linkGenero(_model.Generos[i])
+        }
+    }
+
+    @: | <span>@_model.Filme.DataLancamento?.ToShortDateString()</span>
+    @: | Média:  @_model.MediaVotos.ToString("0.#")/5 | Seu voto: @_model.VotoUsuario.ToString("0.#")
+
+    <div style="display: flex; margin-top: 10px;">
+        <span style="display: inline-block; margin-right: 5px;">
+            <img src="@_model.Filme.Poster" style="width: 225px; height: 315px" alt="@_model.Filme.Titulo"/></span>
+        <iframe width="560" height="315" src="https://www.youtube.com/embed/@_model.Filme.Trailer" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+    </div>
+    <div style="margin-top: 10px;">
+        <h3>Resumo</h3>
+        <div>
+            <MostrarMarkdown ConteudoMarkdown="@_model.Filme.Resumo"></MostrarMarkdown>
+        </div>
+    </div>
+    <div style="margin-top: 10px;">
+        <h3>Elenco</h3>
+        <div style="display: flex; flex-direction: column">
+            @foreach (var ator in _model.Atores)
+            {
+                <div style="margin-bottom: 2px;">
+                    <img style="width: 50px;" src="@ator.Foto" alt="@ator.Nome" title="@ator.Nome"/>
+                    <span style="display:inline-block;width: 200px;">
+                        <a href="/pessoa/@ator.Id/@ator.Nome.Replace(" ", "-")">@ator.Nome</a>
+                    </span>
+                    <span style="display:inline-block; width: 25px;">...</span>
+                    <span>@ator.Personagem</span>
+                </div>
+            }
+        </div>
+    </div>
+}
+
+@code {
+    [Parameter] public int Id { get; set; }
+    [Parameter] public string Titulo { get; set; }
+    private VisualizarFilmeDTO _model;
+    private readonly RenderFragment<Genero> _linkGenero = (genero) =>@<a href="filme/pesquisar?idgenero=@genero.Id">@genero.Nome</a>;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var responseHttp = await Repository.Get<VisualizarFilmeDTO>($"api/filme/{Id}");
+        if (responseHttp.Error)
+        {
+            if (responseHttp.HttpResponseMessage.StatusCode == System.Net.HttpStatusCode.NotFound)
+            {
+                NavigationManager.NavigateTo("");
+            }
+            else
+            {
+                var mensajeError = await responseHttp.GetBody();
+                await MostrarMensagem.MostrarMensagemErro(mensajeError);
+            }
+        }
+        else
+        {
+            _model = responseHttp.Response;
+        }
+    }
+}

@@ -1,0 +1,36 @@
+﻿@using CursoBlazor.Client.Helpers
+@inject IJSRuntime Js
+@inject IRepository Repository
+@inject IMostrarMensagem MostrarMensagem
+
+<div style="display: flex; flex-wrap: wrap; align-items: center">
+    <ListaGenerica Lista="Filmes">
+        <ExisteRegistro Context="pelicula">
+            <FilmeIndividual Filme="pelicula"
+                             EliminarFilme="EliminarFilme" />
+        </ExisteRegistro>
+    </ListaGenerica>
+</div>
+
+@code {
+    [Parameter]
+    public List<Filme> Filmes { get; set; }
+
+    async Task EliminarFilme(Filme filme)
+    {
+        var confirmado = await Js.Confirm("Deseja realmente excluir o filme " + filme.Titulo);
+        if (confirmado)
+        {
+            var responseHttp = await Repository.Delete($"api/filme/{filme.Id}");
+            if (responseHttp.Error)
+            {
+                await MostrarMensagem.MostrarMensagemErro(await responseHttp.GetBody());
+            }
+            else
+            {
+                Filmes.Remove(filme);
+            }
+        }
+    }
+
+}

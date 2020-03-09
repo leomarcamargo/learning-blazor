@@ -1,0 +1,53 @@
+﻿@page "/pessoa/editar/{Id:int}"
+@inject IRepository Repository
+@inject IMostrarMensagem MostrarMensagem
+@inject NavigationManager NavigationManager
+
+<h3>Atualizar Pessoa</h3>
+<hr />
+@if (_pessoa == null)
+{
+    @: Carregando...
+}
+else
+{
+    <FormularioPessoa OnValidSubmit="Editar" Pessoa="_pessoa" />
+}
+
+@code {
+    [Parameter] public int Id { get; set; }
+    private Pessoa _pessoa;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var httpResponse = await Repository.Get<Pessoa>($"api/pessoa/{Id}");
+        if (httpResponse.Error)
+        {
+            if (httpResponse.HttpResponseMessage.StatusCode == System.Net.HttpStatusCode.NotFound)
+            {
+                NavigationManager.NavigateTo("pessoa");
+            }
+            else
+            {
+                await MostrarMensagem.MostrarMensagemErro(await httpResponse.GetBody());
+            }
+        }
+        else
+        {
+            _pessoa = httpResponse.Response;
+        }
+    }
+
+    private async Task Editar()
+    {
+        var httpResponse = await Repository.Put("api/pessoa", _pessoa);
+        if (httpResponse.Error)
+        {
+            await MostrarMensagem.MostrarMensagemErro(await httpResponse.GetBody());
+        }
+        else
+        {
+            NavigationManager.NavigateTo("pessoa");
+        }
+    }
+}

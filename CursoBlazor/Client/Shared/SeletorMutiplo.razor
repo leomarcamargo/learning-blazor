@@ -1,0 +1,50 @@
+﻿@using CursoBlazor.Client.Helpers
+    <div class="seletor-multiplo">
+        <ul class="ul-selecionavel">
+            @foreach (var item in NaoSelecionados)
+            {
+                <li @onclick="@(() => Selecionar(item))">@item.Valor</li>
+            }
+        </ul>
+        <div class="seletor-multiplo-botao">
+            <button type="button" @onclick="SelecionarTudo">@selecionarTudoTexto</button>
+            <button type="button" @onclick="DeselecionarTudo">@removerTudoTexto</button>
+        </div>
+        <ul class="ul-selecionavel">
+            @foreach (var item in Selecionados)
+            {
+                <li @onclick="@(() => Deselecionar(item))">@item.Valor</li>
+            }
+        </ul>
+    </div>
+
+@code {
+    private readonly string selecionarTudoTexto = ">>";
+    private readonly string removerTudoTexto = "<<";
+    [Parameter] public  List<SeletorMultiploModel> NaoSelecionados { get; set; } = new List<SeletorMultiploModel>();
+    [Parameter] public  List<SeletorMultiploModel> Selecionados { get; set; } = new List<SeletorMultiploModel>();
+
+    private void Selecionar(SeletorMultiploModel item)
+    {
+        NaoSelecionados.Remove(item);
+        Selecionados.Add(item);
+    }
+    
+    private void Deselecionar(SeletorMultiploModel item)
+    {
+        Selecionados.Remove(item);
+        NaoSelecionados.Add(item);
+    }
+
+    private void SelecionarTudo()
+    {
+        Selecionados.AddRange(NaoSelecionados);
+        NaoSelecionados.Clear();
+    }
+    
+    private void DeselecionarTudo()
+    {
+        NaoSelecionados.AddRange(Selecionados);
+        Selecionados.Clear();
+    }
+}

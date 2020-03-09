@@ -1,0 +1,27 @@
+﻿@page "/genero/criar"
+@inject IRepository Repository
+@inject NavigationManager Navigation
+@inject IMostrarMensagem MostrarMensagem
+
+<h3>Novo Gênero</h3>
+<hr />
+<FormularioGenero OnValidSubmit="Cadastrar" Genero="_genero" />
+
+@code {
+    private readonly Genero _genero = new Genero();
+
+    private async Task Cadastrar()
+    {
+        var httpResponse = await Repository.Post("api/genero", _genero);
+        if (httpResponse.Error)
+        {
+            await MostrarMensagem.MostrarMensagemErro(await httpResponse.GetBody());
+        }
+        else
+        {
+            Navigation.NavigateTo("/genero");
+        }
+
+        Console.WriteLine(_genero.Nome);
+    }
+}

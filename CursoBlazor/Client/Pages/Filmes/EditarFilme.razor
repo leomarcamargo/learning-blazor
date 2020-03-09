@@ -1,0 +1,65 @@
+﻿@page "/filme/editar/{Id:int}"
+@inject IRepository Repository
+@inject IMostrarMensagem MostrarMensagem
+@inject NavigationManager NavigationManager
+
+<h3>Atualizar Filme</h3>
+<hr />
+
+@if (_filme == null)
+{
+    @: Carregando...
+}
+else
+{
+    <FormularioFilme OnValidSubmit="Editar"
+                     Filme="_filme"
+                     AtoresSelecionados ="_atoresSelecionados"
+                     GenerosNaoSelecionados="_generosNaoSelecionados"
+                     GenerosSelecionados="_generosSelecionados" />
+}
+
+@code {
+    [Parameter] public int Id { get; set; }
+    Filme _filme;
+    private List<Genero> _generosSelecionados = new List<Genero>();
+    private List<Genero> _generosNaoSelecionados = new List<Genero>();
+    private List<Pessoa> _atoresSelecionados = new List<Pessoa>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        var httpResponse = await Repository.Get<AtualizarFilmeDTO>($"api/filme/atualizar/{Id}");
+        if (httpResponse.Error)
+        {
+            if (httpResponse.HttpResponseMessage.StatusCode == System.Net.HttpStatusCode.NotFound)
+            {
+                NavigationManager.NavigateTo("filme");
+            }
+            else
+            {
+                await MostrarMensagem.MostrarMensagemErro(await httpResponse.GetBody());
+            }
+        }
+        else
+        {
+            var modelo = httpResponse.Response;
+            _atoresSelecionados = modelo.Atores;
+            _generosNaoSelecionados = modelo.GenerosNaoSelecionados;
+            _generosSelecionados = modelo.GenerosSelecionados;
+            _filme = modelo.Filme;
+        }
+    }
+
+    private async Task Editar()
+    {
+        var httpResponse = await Repository.Put("api/filme", _filme);
+        if (httpResponse.Error)
+        {
+            await MostrarMensagem.MostrarMensagemErro(await httpResponse.GetBody());
+        }
+        else
+        {
+            NavigationManager.NavigateTo($"filme/{Id}");
+        }
+    }
+}

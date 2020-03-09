@@ -1,0 +1,27 @@
+﻿@page "/pessoa/criar"
+@inject IRepository Repository
+@inject NavigationManager Navigation
+@inject IMostrarMensagem MostrarMensagem
+
+<h3>Nova Pessoa</h3>
+<hr />
+<FormularioPessoa OnValidSubmit="Cadastrar" Pessoa="_pessoa" />
+
+@code {
+    private readonly Pessoa _pessoa = new Pessoa();
+
+    private async Task Cadastrar()
+    {
+        var httpResponse = await Repository.Post("api/pessoa", _pessoa);
+        if (httpResponse.Error)
+        {
+            await MostrarMensagem.MostrarMensagemErro(await httpResponse.GetBody());
+        }
+        else
+        {
+            Navigation.NavigateTo("/pessoa");
+        }
+
+        Console.WriteLine(_pessoa.Nome);
+    }
+}

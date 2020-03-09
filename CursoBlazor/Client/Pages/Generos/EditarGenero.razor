@@ -1,0 +1,55 @@
+﻿@page "/genero/editar/{Id:int}"
+@inject IRepository Repository
+@inject IMostrarMensagem MostrarMensagem
+@inject NavigationManager NavigationManager
+
+<h3>Atualizar Gênero</h3>
+<hr />
+@if (_genero == null)
+{
+    @: Carregando...
+}
+else
+{
+    <FormularioGenero OnValidSubmit="Editar" Genero="_genero" />
+}
+
+
+@code {
+    [Parameter] public int Id { get; set; }
+
+    private Genero _genero;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var httpResponse = await Repository.Get<Genero>($"api/genero/{Id}");
+        if (httpResponse.Error)
+        {
+            if (httpResponse.HttpResponseMessage.StatusCode == System.Net.HttpStatusCode.NotFound)
+            {
+                NavigationManager.NavigateTo("genero");
+            }
+            else
+            {
+                await MostrarMensagem.MostrarMensagemErro(await httpResponse.GetBody());
+            }
+        }
+        else
+        {
+            _genero = httpResponse.Response;
+        }
+    }
+
+    private async Task Editar()
+    {
+        var httpResponse = await Repository.Put("api/genero", _genero);
+        if (httpResponse.Error)
+        {
+            await MostrarMensagem.MostrarMensagemErro(await httpResponse.GetBody());
+        }
+        else
+        {
+            NavigationManager.NavigateTo("genero");
+        }
+    }
+}

@@ -1,0 +1,63 @@
+﻿@page "/genero"
+@inject IRepository Repository
+@inject IMostrarMensagem MostrarMensagem
+
+<div class="clearfix mb-3">
+    <h3 class="float-left">Gêneros</h3>
+    <a class="btn btn-primary float-right" href="genero/criar">
+        Cadastrar
+    </a>
+</div>
+
+<ListaGenerica Lista="Generos">
+    <ExisteRegistrosCompleto>
+        <table class="table table-sm table-striped">
+            <thead>
+                <tr>
+                    <th>NOME</th>
+                    <th>AÇÕES</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var genero in Generos)
+                {
+                    <tr>
+                        <td>@genero.Nome</td>
+                        <td>
+                            <a href="/genero/editar/@genero.Id" class="btn btn-warning btn-sm">Editar</a> | 
+                            <button class="btn btn-danger btn-sm" @onclick="@(() => ExcluirGenero(genero))">Excluir</button>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </ExisteRegistrosCompleto>
+</ListaGenerica>
+
+@code {
+    public List<Genero> Generos { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await Carregar();
+    }
+
+    private async Task Carregar()
+    {
+        var responseHttp = await Repository.Get<List<Genero>>("api/genero");
+        Generos = responseHttp.Response;
+    }
+
+    public async Task ExcluirGenero(Genero genero)
+    {
+        var responseHttp = await Repository.Delete($"api/genero/{genero.Id}");
+        if (responseHttp.Error)
+        {
+            await MostrarMensagem.MostrarMensagemErro(await responseHttp.GetBody());
+        }
+        else
+        {
+            await Carregar();
+        }
+    }
+}

@@ -1,0 +1,46 @@
+﻿@typeparam TItem
+
+@if (Lista == null)
+{
+    @if (Carregando == null)
+    {
+        @: <p class="text-center">Carregando</p>
+    }
+    else
+    {
+        <p class="text-center">@Carregando</p>
+    }
+}
+else if (Lista.Count == 0)
+{
+    @if (SemRegistro == null)
+    {
+        <p class="text-center">Nenhum registro para ser exibido</p>
+    }
+    else
+    {
+        <p class="text-center">@SemRegistro</p>
+    }
+}
+else
+{
+    if (ExisteRegistro != null)
+    {
+        foreach (var item in Lista)
+        {
+            @ExisteRegistro(item)
+        }
+    }
+    else
+    {
+        @ExisteRegistrosCompleto
+    }
+}
+
+@code {
+    [Parameter] public RenderFragment Carregando { get; set; }
+    [Parameter] public RenderFragment SemRegistro { get; set; }
+    [Parameter] public RenderFragment<TItem> ExisteRegistro { get; set; }
+    [Parameter] public RenderFragment ExisteRegistrosCompleto { get; set; }
+    [Parameter] public List<TItem> Lista { get; set; }
+}
