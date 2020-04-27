@@ -11,7 +11,7 @@
 else
 {
     <h2>@_model.Filme.Titulo (@_model.Filme.DataLancamento?.ToString("yyyy"))</h2>
-    for (int i = 0; i < _model.Generos.Count; i++)
+    for (var i = 0; i < _model.Generos.Count; i++)
     {
         if (i < _model.Generos.Count - 1)
         {

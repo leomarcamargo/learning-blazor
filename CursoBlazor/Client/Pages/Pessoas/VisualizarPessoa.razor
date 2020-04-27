@@ -1,0 +1,55 @@
+﻿@page "/pessoa/{Id:int}"
+@page "/pessoa/{Id:int}/{Nome}"
+@inject IRepository Repository
+@inject NavigationManager NavigationManager
+@inject IMostrarMensagem MostrarMensagem
+
+@if (_model == null)
+{
+    <p class="text-center">Carregando</p>
+}
+else
+{
+    <h2 class="font-weight-bold">@_model.Pessoa.Nome</h2>
+    <span><strong>NASCIMENTO</strong>: @_model.Pessoa.DataNascimento?.ToShortDateString()</span>
+    <div style="display: flex; margin-top: 10px;">
+        <div style="display: inline-block; margin-right: 10px;">
+            <img src="@_model.Pessoa.Foto" style="width: 225px; height: 315px" alt="@_model.Pessoa.Nome" />
+        </div>
+        @if (!string.IsNullOrWhiteSpace(_model.Pessoa.Biografia))
+        {
+            <div style="display: inline-block; margin-right: 5px;">
+                <h4 class="font-weight-bold">Biografia</h4>
+                <MostrarMarkdown ConteudoMarkdown="@_model.Pessoa.Biografia"></MostrarMarkdown>
+            </div>
+        }
+    </div>
+}
+
+@code {
+    [Parameter] public int Id { get; set; }
+    [Parameter] public string Nome { get; set; }
+    private VisualizarPessoaDTO _model;
+    //private readonly RenderFragment<Genero> _linkGenero = (genero) =>@<a href="filme/pesquisar?idgenero=@genero.Id">@genero.Nome</a>;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var responseHttp = await Repository.Get<VisualizarPessoaDTO>($"api/pessoa/visualizar/{Id}");
+        if (responseHttp.Error)
+        {
+            if (responseHttp.HttpResponseMessage.StatusCode == System.Net.HttpStatusCode.NotFound)
+            {
+                NavigationManager.NavigateTo("");
+            }
+            else
+            {
+                var mensagemErro = await responseHttp.GetBody();
+                await MostrarMensagem.MostrarMensagemErro(mensagemErro);
+            }
+        }
+        else
+        {
+            _model = responseHttp.Response;
+        }
+    }
+}

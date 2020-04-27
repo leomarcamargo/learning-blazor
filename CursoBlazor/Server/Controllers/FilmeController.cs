@@ -1,8 +1,10 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
 using CursoBlazor.Server.Helpers;
+using CursoBlazor.Server.Models;
 using CursoBlazor.Shared.DTO;
 using CursoBlazor.Shared.Entidades;
 using Microsoft.AspNetCore.Mvc;
@@ -183,6 +185,70 @@ namespace CursoBlazor.Server.Controllers
             await _db.SaveChangesAsync();
 
             return NoContent();
+        }
+
+        [HttpGet("filtrar")]
+        public async Task<ActionResult<List<Filme>>> Get([FromQuery] ParametrosPesquisarFilmes parametros)
+        {
+            var filmesQueryable = _db.Filme.AsQueryable();
+
+            if (!string.IsNullOrWhiteSpace(parametros.Titulo))
+            {
+                filmesQueryable = filmesQueryable.Where(x => x.Titulo.ToLower().Contains(parametros.Titulo.ToLower()));
+            }
+
+            if (parametros.EmCartaz)
+            {
+                filmesQueryable = filmesQueryable.Where(x => x.EmCartaz);
+            }
+
+            if (parametros.Estreias)
+            {
+                var hoje = DateTime.Today;
+                filmesQueryable = filmesQueryable.Where(x => x.DataLancamento >= hoje);
+            }
+
+            if (parametros.GeneroId != 0)
+            {
+                filmesQueryable = filmesQueryable.Where(x => x.GeneroFilme.Any(y => y.IdGenero == parametros.GeneroId));
+            }
+
+            //TODO: implementar votação
+
+            await HttpContext.InserirParamentroPaginacaoResposta(filmesQueryable, parametros.QuantidadeRegistros);
+
+            var filmes = await filmesQueryable.Paginar(parametros.Paginacao).ToListAsync();
+
+            return filmes;
+        }
+
+        [HttpGet("{id}")]
+        public async Task<ActionResult<VisualizarPessoaDTO>> Visualizar(int id)
+        {
+            var pessoa = await _db.Pessoa
+                .Include(x => x.FilmePessoa)
+                .ThenInclude(x => x.Filme)
+                .ThenInclude(x => x.GeneroFilme)
+                .ThenInclude(x => x.Genero)
+                .FirstOrDefaultAsync(x => x.Id == id);
+
+            if (pessoa == null)
+            {
+                return NotFound();
+            }
+
+            var filmes = pessoa.FilmePessoa
+                .OrderByDescending(x => x.Filme.DataLancamento)
+                .Select(x => x.Filme)
+                .ToList();
+
+            var model = new VisualizarPessoaDTO
+            {
+                Pessoa = pessoa,
+                Filmes = filmes
+            };
+
+            return model;
         }
     }
 }

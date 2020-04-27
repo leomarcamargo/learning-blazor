@@ -43,7 +43,7 @@
         var conexaoAnterior = PaginaAtual - 1;
         Conexoes.Add(new PaginasModel(conexaoAnterior, conexaoPaginaAnterior, "Anterior"));
 
-        for (var i = 1; i < TotalPaginas; i++)
+        for (var i = 1; i <= TotalPaginas; i++)
         {
             if (i >= PaginaAtual - Radio && i <= PaginaAtual + Radio)
             {
@@ -81,5 +81,4 @@
         public bool Habilitada { get; set; } = true;
         public bool Ativa { get; set; } = false;
     }
-
 }

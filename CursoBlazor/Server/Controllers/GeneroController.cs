@@ -1,5 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
+using CursoBlazor.Server.Helpers;
+using CursoBlazor.Shared.DTO;
 using CursoBlazor.Shared.Entidades;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -17,9 +19,13 @@ namespace CursoBlazor.Server.Controllers
             _db = db;
         }
 
-        public async Task<ActionResult<List<Genero>>> Get()
+        public async Task<ActionResult<List<Pessoa>>> Get([FromQuery] PaginacaoDTO paginacao)
         {
-            return await _db.Genero.ToListAsync();
+            var queryable = _db.Genero.AsQueryable();
+
+            await HttpContext.InserirParamentroPaginacaoResposta(queryable, paginacao.QuantidadeRegistro);
+
+            return await _db.Pessoa.Paginar(paginacao).ToListAsync();
         }
 
         [HttpGet("{id}")]

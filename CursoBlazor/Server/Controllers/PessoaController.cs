@@ -111,5 +111,34 @@ namespace CursoBlazor.Server.Controllers
 
             return NoContent();
         }
+
+        [HttpGet("visualizar/{id}")]
+        public async Task<ActionResult<VisualizarPessoaDTO>> Visualizar(int id)
+        {
+            var pessoa = await _db.Pessoa
+                .Include(x => x.FilmePessoa)
+                .ThenInclude(x => x.Filme)
+                .ThenInclude(x => x.GeneroFilme)
+                .ThenInclude(x => x.Genero)
+                .FirstOrDefaultAsync(x => x.Id == id);
+
+            if (pessoa == null)
+            {
+                return NotFound();
+            }
+
+            var filmes = pessoa.FilmePessoa
+                .OrderByDescending(x => x.Filme.DataLancamento)
+                .Select(x => x.Filme)
+                .ToList();
+
+            var model = new VisualizarPessoaDTO
+            {
+                Pessoa = pessoa,
+                Filmes = filmes
+            };
+
+            return model;
+        }
     }
 }

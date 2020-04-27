@@ -25,6 +25,7 @@
                         <td>@pessoa.Nome</td>
                         <td>
                             <a href="/pessoa/editar/@pessoa.Id" class="btn btn-warning btn-sm">Editar</a> |
+                            <a href="/pessoa/@pessoa.Id/@pessoa.Nome.Replace(" ", "-")" class="btn btn-sm btn-info">Visualizar</a> |
                             <button class="btn btn-danger btn-sm" @onclick="@(() => ExcluirPessoa(pessoa))">Excluir</button>
                         </td>
                     </tr>
@@ -56,14 +57,13 @@
 
     private async Task Carregar(int pagina = 1)
     {
-        var responseHttp = await Repository.Get<List<Pessoa>>($"api/pessoa?pagina={pagina}");
-        if (!responseHttp.Error)
+        var httpResponse = await Repository.Get<List<Pessoa>>($"api/pessoa?pagina={pagina}");
+        if (!httpResponse.Error)
         {
-            Pessoa = responseHttp.Response;
-            var quantidade = responseHttp.HttpResponseMessage.Headers.GetValues("quantidade").FirstOrDefault();
-            _totalPaginas = int.Parse(responseHttp.HttpResponseMessage.Headers.GetValues("totalPaginas").FirstOrDefault());
+            Pessoa = httpResponse.Response;
+            var quantidade = httpResponse.HttpResponseMessage.Headers.GetValues("quantidade").FirstOrDefault();
+            _totalPaginas = int.Parse(httpResponse.HttpResponseMessage.Headers.GetValues("totalPaginas").FirstOrDefault());
         }
-        
     }
 
     public async Task ExcluirPessoa(Pessoa pessoa)

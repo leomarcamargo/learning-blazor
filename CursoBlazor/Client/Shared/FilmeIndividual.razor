@@ -1,11 +1,11 @@
-﻿<div style="margin-right: 2%; margin-bottom: 10px; text-align: center">
+﻿<div style="margin-right: 2%; margin-bottom: 20px; text-align: center">
     <a href="@_urlFilme">
         <img src="@Filme.Poster" alt="Poster" style="width: 225px; height: 300px"/>
     </a>
     <p style="max-width: 225px; height: 44px; font-size: 15px; font-weight: bold"><a href="@_urlFilme">@Filme.TituloCurto</a></p>
     <div>
-        <a href="/filme/editar/@Filme.Id" class="btn btn-info">Editar</a>
-        <button type="button" class="btn btn-danger" @onclick="@(() => EliminarFilme.InvokeAsync(Filme))">Excluir</button>
+        <a href="/filme/editar/@Filme.Id" class="btn btn-sm btn-warning">Editar</a>
+        <button type="button" class="btn btn-sm btn-danger" @onclick="@(() => EliminarFilme.InvokeAsync(Filme))">Excluir</button>
     </div>
 </div>
 

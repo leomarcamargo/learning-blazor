@@ -1,13 +1,12 @@
-﻿@using CursoBlazor.Client.Helpers
-@inject IJSRuntime Js
+﻿@inject IJSRuntime Js
 @inject IRepository Repository
 @inject IMostrarMensagem MostrarMensagem
 
 <div style="display: flex; flex-wrap: wrap; align-items: center">
     <ListaGenerica Lista="Filmes">
-        <ExisteRegistro Context="pelicula">
-            <FilmeIndividual Filme="pelicula"
-                             EliminarFilme="EliminarFilme" />
+        <ExisteRegistro Context="filme">
+            <FilmeIndividual Filme="filme"
+                             EliminarFilme="EliminarFilme" @key="filme.Id" />
         </ExisteRegistro>
     </ListaGenerica>
 </div>
@@ -32,5 +31,4 @@
             }
         }
     }
-
 }
