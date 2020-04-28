@@ -19,13 +19,13 @@ namespace CursoBlazor.Server.Controllers
             _db = db;
         }
 
-        public async Task<ActionResult<List<Pessoa>>> Get([FromQuery] PaginacaoDTO paginacao)
+        public async Task<ActionResult<List<Genero>>> Get([FromQuery] PaginacaoDTO paginacao)
         {
             var queryable = _db.Genero.AsQueryable();
 
             await HttpContext.InserirParamentroPaginacaoResposta(queryable, paginacao.QuantidadeRegistro);
 
-            return await _db.Pessoa.Paginar(paginacao).ToListAsync();
+            return await queryable.Paginar(paginacao).ToListAsync();
         }
 
         [HttpGet("{id}")]

@@ -32,7 +32,7 @@ namespace CursoBlazor.Server.Controllers
 
             await HttpContext.InserirParamentroPaginacaoResposta(queryable, paginacao.QuantidadeRegistro);
 
-            return await _db.Pessoa.Paginar(paginacao).ToListAsync();
+            return await queryable.Paginar(paginacao).ToListAsync();
         }
 
         
@@ -115,7 +115,7 @@ namespace CursoBlazor.Server.Controllers
         [HttpGet("visualizar/{id}")]
         public async Task<ActionResult<VisualizarPessoaDTO>> Visualizar(int id)
         {
-            var pessoa = await _db.Pessoa
+            var pessoa = await _db.Pessoa.AsNoTracking()
                 .Include(x => x.FilmePessoa)
                 .ThenInclude(x => x.Filme)
                 .ThenInclude(x => x.GeneroFilme)

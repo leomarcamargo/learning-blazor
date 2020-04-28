@@ -58,8 +58,7 @@
         if (!httpResponse.Error)
         {
             Generos = httpResponse.Response;
-            var quantidade = httpResponse.HttpResponseMessage.Headers.GetValues("quantidade").FirstOrDefault();
-            _totalPaginas = int.Parse(httpResponse.HttpResponseMessage.Headers.GetValues("totalPaginas").FirstOrDefault());
+            _totalPaginas = int.Parse(httpResponse.HttpResponseMessage.Headers.GetValues("totalPaginas").FirstOrDefault() ?? string.Empty);
         }
     }
 
