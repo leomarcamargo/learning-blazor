@@ -15,7 +15,7 @@ namespace CursoBlazor.Server.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin")]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "admin")]
     public class PessoaController : ControllerBase
     {
         private readonly ApplicationDbContext _db;

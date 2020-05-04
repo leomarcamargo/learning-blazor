@@ -1,6 +1,7 @@
 ﻿@page "/pessoa"
 @inject IRepository Repository
 @inject IMostrarMensagem MostrarMensagem
+@attribute [Authorize(Roles = "admin")]
 
 <div class="clearfix mb-3">
     <h3 class="float-left">Pessoas</h3>

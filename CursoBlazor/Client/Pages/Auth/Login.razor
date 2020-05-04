@@ -13,7 +13,7 @@
     <div class="form-group">
         <label>Email:</label>
         <div>
-            <InputText Class="form-control" @bind-Value="@_userInfo.Email" />
+            <InputText Class="form-control" @bind-Value="@_userInfo.Email" autocomplete="new-password" />
             <ValidationMessage For="@(() => _userInfo.Email)" />
         </div>
     </div>
@@ -21,7 +21,7 @@
     <div class="form-group">
         <label>Senha:</label>
         <div>
-            <InputPassword Class="form-control" @bind-Value="@_userInfo.Senha" />
+            <InputPassword Class="form-control" @bind-Value="@_userInfo.Senha" autocomplete="new-password" />
             <ValidationMessage For="@(() => _userInfo.Senha)" />
         </div>
     </div>
@@ -43,7 +43,7 @@
         }
         else
         {
-            await LoginService.Login(httpResponse.Response.Token);
+            await LoginService.Login(httpResponse.Response);
             NavigationManager.NavigateTo("");
         }
     }

@@ -6,6 +6,8 @@ using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 using CursoBlazor.Shared.DTO;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
@@ -44,9 +46,24 @@ namespace CursoBlazor.Server.Controllers
             return BadRequest("Usuário ou senha incorretos");
         }
 
+        [HttpGet("RenovarToken")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        public async Task<ActionResult<UserToken>> Renovar()
+        {
+            var userInfo = new UserInfo
+            {
+                Email = HttpContext.User.Identity.Name
+            };
+
+            var usuario = await _userManager.FindByEmailAsync(userInfo.Email);
+            var roles = await _userManager.GetRolesAsync(usuario);
+
+            return BuildToken(userInfo, roles);
+        }
+
         private UserToken BuildToken(UserInfo userInfo, IList<string> roles)
         {
-            var claims = new List<Claim>()
+            var claims = new List<Claim>
             {
                 new Claim(JwtRegisteredClaimNames.UniqueName, userInfo.Email),
                 new Claim(ClaimTypes.Name, userInfo.Email),
@@ -56,11 +73,10 @@ namespace CursoBlazor.Server.Controllers
 
             claims.AddRange(roles.Select(rol => new Claim(ClaimTypes.Role, rol)));
 
-
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["JWT:key"]));
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
-            var expiration = DateTime.UtcNow.AddYears(1);
+            var expiration = DateTime.UtcNow.AddMinutes(1);
 
             var token = new JwtSecurityToken(
                 issuer: null,
@@ -84,7 +100,6 @@ namespace CursoBlazor.Server.Controllers
 
             if (resultado.Succeeded)
             {
-
                 var usuario = await _userManager.FindByEmailAsync(login.Email);
                 var roles = await _userManager.GetRolesAsync(usuario);
 

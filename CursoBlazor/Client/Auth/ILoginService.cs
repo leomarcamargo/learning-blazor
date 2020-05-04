@@ -1,13 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
+using CursoBlazor.Shared.DTO;
 
 namespace CursoBlazor.Client.Auth
 {
     public interface ILoginService
     {
-        Task Login(string token);
+        Task Login(UserToken userToken);
         Task Logout();
+        Task ConduzirRenovacaoToken();
     }
 }

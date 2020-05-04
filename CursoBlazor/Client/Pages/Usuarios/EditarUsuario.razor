@@ -1,0 +1,69 @@
+﻿@page "/usuario/editar/{IdUsuario}"
+@inject IRepository Repository
+@inject IMostrarMensagem MostrarMensagem
+
+<h3>Atualizar Usuário</h3>
+<hr />
+
+<div class="form-inline">
+    <select class="form-control mb-2 mr-sm-2" @bind="_roleSelecionada">
+        <option value="0">Selecione a role do usuário</option>
+        @foreach (var rol in _roles)
+        {
+            <option value="@rol.Nome">@rol.Nome</option>
+        }
+    </select>
+    <button class="btn btn-info mb-2 mr-sm-2" @onclick="AdicionarRole">Adicionar Role</button>
+    <button class="btn btn-danger mb-2 mr-sm-2" @onclick="RemoverRole">Remover Role</button>
+</div>
+
+@code {
+    [Parameter] public string IdUsuario { get; set; }
+    private List<RolesDTO> _roles = new List<RolesDTO>();
+    private string _roleSelecionada = "0";
+
+    protected override async Task OnInitializedAsync()
+    {
+        var httpResponse = await Repository.Get<List<RolesDTO>>("api/usuario/roles");
+
+        if (httpResponse.Error)
+        {
+            await MostrarMensagem.MostrarMensagemErro(await httpResponse.GetBody());
+        }
+        else
+        {
+            _roles = httpResponse.Response;
+        }
+    }
+
+    private async Task AdicionarRole()
+    {
+        await EditarRole("api/usuario/adicionarrole");
+    }
+
+    private async Task RemoverRole()
+    {
+        await EditarRole("api/usuario/removerrole");
+    }
+
+    private async Task EditarRole(string url)
+    {
+        if (_roleSelecionada == "0")
+        {
+            await MostrarMensagem.MostrarMensagemErro("Selecione pelo menos uma role");
+            return;
+        }
+
+        var roleUsuario = new EditarRoleDTO() { IdRole = _roleSelecionada, IdUsuario = IdUsuario };
+        var httpResponse = await Repository.Post<EditarRoleDTO>(url, roleUsuario);
+
+        if (httpResponse.Error)
+        {
+            await MostrarMensagem.MostrarMensagemErro(await httpResponse.GetBody());
+        }
+        else
+        {
+            await MostrarMensagem.MostrarMensagemSucesso("Usuário atualizado com sucesso");
+        }
+    }
+}

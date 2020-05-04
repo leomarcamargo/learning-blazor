@@ -16,10 +16,10 @@ namespace CursoBlazor.Server.Controllers
         private readonly ApplicationDbContext _db;
         private readonly UserManager<IdentityUser> _userManager;
 
-        public VotoController(ApplicationDbContext context,
+        public VotoController(ApplicationDbContext db,
             UserManager<IdentityUser> userManager)
         {
-            _db = context;
+            _db = db;
             _userManager = userManager;
         }
 

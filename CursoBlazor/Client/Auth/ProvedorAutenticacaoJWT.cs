@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
@@ -7,6 +8,8 @@ using System.Security.Claims;
 using System.Text.Json;
 using System.Threading.Tasks;
 using CursoBlazor.Client.Helpers;
+using CursoBlazor.Client.Repository;
+using CursoBlazor.Shared.DTO;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.JSInterop;
 
@@ -16,14 +19,17 @@ namespace CursoBlazor.Client.Auth
     {
         private readonly IJSRuntime _js;
         private readonly HttpClient _httpClient;
+        private readonly IRepository _repository;
         private const string TokenKey = "TOKENKEY";
+        private const string ExpirationTokenKey = "EXPIRATION   TOKENKEY";
         private AuthenticationState Anonimo => 
             new AuthenticationState(new ClaimsPrincipal(new ClaimsIdentity()));
 
-        public ProvedorAutenticacaoJWT(IJSRuntime js, HttpClient httpClient)
+        public ProvedorAutenticacaoJWT(IJSRuntime js, HttpClient httpClient, IRepository repository)
         {
             _js = js;
             _httpClient = httpClient;
+            _repository = repository;
         }
 
         public override async Task<AuthenticationState> GetAuthenticationStateAsync()
@@ -35,7 +41,66 @@ namespace CursoBlazor.Client.Auth
                 return Anonimo;
             }
 
+            var tempoExpiracao = await _js.GetFromLocalStorage(ExpirationTokenKey);
+
+            if (DateTime.TryParse(tempoExpiracao, out var tempo))
+            {
+                if (TokenExpirado(tempo))
+                {
+                    await Limpar();
+                    return Anonimo;
+                }
+
+                if (DeveRenovarToken(tempo))
+                {
+                    token = await RenovarToken(token);
+                }
+            }
+
             return ConstruirAuthenticationState(token);
+        }
+
+        public async Task ConduzirRenovacaoToken()
+        {
+            var tempoExpiracao = await _js.GetFromLocalStorage(ExpirationTokenKey);
+
+            if (DateTime.TryParse(tempoExpiracao, out var tempo))
+            {
+                if (TokenExpirado(tempo))
+                {
+                    await Logout();
+                }
+
+                if (DeveRenovarToken(tempo))
+                {
+                    var token = await _js.GetFromLocalStorage(TokenKey);
+                    var novoToken = await RenovarToken(token);
+
+                    var authState = ConstruirAuthenticationState(novoToken);
+                    NotifyAuthenticationStateChanged(Task.FromResult(authState));
+                }
+            }
+        }
+
+        private async Task<string> RenovarToken(string token)
+        {
+            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", token);
+            var novoTokenResponse = await _repository.Get<UserToken>("api/conta/renovartoken");
+            var novoToken = novoTokenResponse.Response;
+            await _js.SetInLocalStorage(TokenKey, token);
+            await _js.SetInLocalStorage(ExpirationTokenKey, novoToken.Expiration.ToString(CultureInfo.InvariantCulture));
+
+            return novoToken.Token;
+        }
+
+        private bool DeveRenovarToken(DateTime tempoExpiracao)
+        {
+            return tempoExpiracao.Subtract(DateTime.UtcNow) < TimeSpan.FromMinutes(5);
+        }
+
+        private bool TokenExpirado(DateTime tempoExpiracao)
+        {
+            return tempoExpiracao <= DateTime.UtcNow;
         }
 
         private AuthenticationState ConstruirAuthenticationState(string token)
@@ -86,18 +151,25 @@ namespace CursoBlazor.Client.Auth
             return Convert.FromBase64String(base64);
         }
 
-        public async Task Login(string token)
+        public async Task Login(UserToken userToken)
         {
-            await _js.SetInLocalStorage(TokenKey, token);
-            var authState = ConstruirAuthenticationState(token);
+            await _js.SetInLocalStorage(TokenKey, userToken.Token);
+            await _js.SetInLocalStorage(ExpirationTokenKey, userToken.Expiration.ToString(CultureInfo.InvariantCulture));
+            var authState = ConstruirAuthenticationState(userToken.Token);
             NotifyAuthenticationStateChanged(Task.FromResult(authState));
         }
 
         public async Task Logout()
         {
-            await _js.RemoveItem(TokenKey);
-            _httpClient.DefaultRequestHeaders.Authorization = null;
+            await Limpar();
             NotifyAuthenticationStateChanged(Task.FromResult(Anonimo));
+        }
+
+        private async Task Limpar()
+        {
+            await _js.RemoveItem(TokenKey);
+            await _js.RemoveItem(ExpirationTokenKey);
+            _httpClient.DefaultRequestHeaders.Authorization = null;
         }
     }
 }

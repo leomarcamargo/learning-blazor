@@ -22,6 +22,8 @@ namespace CursoBlazor.Client
             services.AddScoped<ProvedorAutenticacaoJWT>();
             services.AddScoped<AuthenticationStateProvider, ProvedorAutenticacaoJWT>(provider => provider.GetRequiredService<ProvedorAutenticacaoJWT>());
             services.AddScoped<ILoginService, ProvedorAutenticacaoJWT>(provider => provider.GetRequiredService<ProvedorAutenticacaoJWT>());
+
+            services.AddScoped<RenovadorToken>();
         }
 
         public void Configure(IComponentsApplicationBuilder app)

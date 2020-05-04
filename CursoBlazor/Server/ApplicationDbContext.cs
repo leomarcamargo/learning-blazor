@@ -1,4 +1,5 @@
 ﻿using CursoBlazor.Shared.Entidades;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
@@ -23,18 +24,13 @@ namespace CursoBlazor.Server
             modelBuilder.Entity<FilmePessoa>().HasKey(x => new {x.IdPessoa, x.IdFilme});
             modelBuilder.Entity<GeneroFilme>().HasKey(x => new {x.IdGenero, x.IdFilme});
 
-            //var pessoas = new List<Pessoa>();
-            //for (int i = 5; i < 100; i++)
-            //{
-            //    pessoas.Add(new Pessoa
-            //    {
-            //        Id = i,
-            //        Nome = $"Pessoa {i}",
-            //        DataNascimento = DateTime.Today
-            //    });
-            //}
-
-            //modelBuilder.Entity<Pessoa>().HasData(pessoas);
+            var roleAdmin = new IdentityRole
+            {
+                Id = "e50e27ce-4792-47fd-87b0-606250021ce0",
+                Name = "admin",
+                NormalizedName = "ADMIN"
+            };
+            modelBuilder.Entity<IdentityRole>().HasData(roleAdmin);
 
             base.OnModelCreating(modelBuilder);
         }

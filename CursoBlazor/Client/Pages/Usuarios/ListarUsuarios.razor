@@ -1,0 +1,68 @@
+﻿@page "/usuario"
+@inject IRepository Repository
+@inject IMostrarMensagem MostrarMensagem
+
+<div class="clearfix mb-3">
+    <h3 class="float-left">Usuários</h3>
+</div>
+
+<ListaGenerica Lista="_usuarios">
+    <ExisteRegistrosCompleto>
+        <table class="table table-sm table-striped">
+            <thead>
+                <tr>
+                    <th>USUÁRIO</th>
+                    <th>AÇÕES</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var usuario in _usuarios)
+                {
+                    <tr>
+                        <td>
+                            @usuario.Email
+                        </td>
+                        <td>
+                            <a href="/usuario/editar/@usuario.IdUsuario" class="btn btn-warning btn-sm">Editar</a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </ExisteRegistrosCompleto>
+</ListaGenerica>
+
+<Paginacao PaginaAtual="_paginaAtual" PaginaSelecionada="PaginaSelecionada" TotalPaginas="_totalPaginas" />
+
+@code {
+    List<UsuarioDTO> _usuarios;
+
+    private int _paginaAtual = 1;
+    private int _totalPaginas;
+
+    private async Task PaginaSelecionada(int pagina)
+    {
+        _totalPaginas = pagina;
+        await Carregar(pagina);
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await Carregar();
+    }
+
+    private async Task Carregar(int pagina = 1)
+    {
+        var httpResponse = await Repository.Get<List<UsuarioDTO>>($"api/usuario?pagina={pagina}");
+
+        if (httpResponse.Error)
+        {
+            await MostrarMensagem.MostrarMensagemErro(await httpResponse.GetBody());
+        }
+        else
+        {
+            _totalPaginas = int.Parse(httpResponse.HttpResponseMessage.Headers.GetValues("totalPaginas").FirstOrDefault());
+            _usuarios = httpResponse.Response;
+        }
+    }
+}
