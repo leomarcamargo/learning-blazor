@@ -1,0 +1,41 @@
+﻿@inject IMostrarMensagem MostrarMensagem
+
+@for (var i = 1; i <= PontoMaximo; i++)
+{
+    var numeroEstrela = i;
+    <span @onclick="@(() => OnClickHandle(numeroEstrela))"
+           @onmouseover="@(() => OnMouseOverHandle(numeroEstrela))"
+           style="cursor:pointer"
+           class="oi oi-star @(PontoSelecionado >= i ? "checked": null)"></span>
+}
+
+@code {
+    [Parameter] public int PontoMaximo { get; set; }
+    [Parameter] public int PontoSelecionado { get; set; }
+    [Parameter] public EventCallback<int> OnVote { get; set; }
+    [CascadingParameter] public Task<AuthenticationState> AuthenticationState { get; set; }
+    private bool _votado;
+
+    private async Task OnClickHandle(int numeroEstrela)
+    {
+        var authState = await AuthenticationState;
+        if (authState.User.Identity.IsAuthenticated)
+        {
+            PontoSelecionado = numeroEstrela;
+            _votado = true;
+            await OnVote.InvokeAsync(PontoSelecionado);
+        }
+        else
+        {
+            await MostrarMensagem.MostrarMensagemErro("Você deve estar realizar o seu voto!");
+        }
+    }
+
+    private void OnMouseOverHandle(int numeroEstrella)
+    {
+        if (!_votado)
+        {
+            PontoSelecionado = numeroEstrella;
+        }
+    }
+}

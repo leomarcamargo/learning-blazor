@@ -10,10 +10,16 @@ namespace CursoBlazor.Shared.Entidades
     {
         [Key]
         public int Id { get; set; }
+
         public int IdFilme { get; set; }
+        
         [ForeignKey("IdFilme")]
         public virtual Filme Filme { get; set; }
+
+        public string IdUsuario { get; set; }
+
         public int Voto { get; set; }
+
         public DateTime DataVoto { get; set; }
     }
 }

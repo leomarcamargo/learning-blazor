@@ -24,7 +24,8 @@ else
     }
 
     @: | <span>@_model.Filme.DataLancamento?.ToShortDateString()</span>
-    @: | Média:  @_model.MediaVotos.ToString("0.#")/5 | Seu voto: @_model.VotoUsuario.ToString("0.#")
+    @: | Média:  @_model.MediaVotos.ToString("0.#")/5 | Seu voto:
+    <Rating PontoMaximo="5" PontoSelecionado="_model.VotoUsuario" OnVote="OnVote"></Rating>
 
     <div style="display: flex; margin-top: 10px;">
         <span style="display: inline-block; margin-right: 5px;">
@@ -60,6 +61,21 @@ else
     [Parameter] public string Titulo { get; set; }
     private VisualizarFilmeDTO _model;
     private readonly RenderFragment<Genero> _linkGenero = (genero) =>@<a href="filme/pesquisar?idgenero=@genero.Id">@genero.Nome</a>;
+
+    private async Task OnVote(int votoSelecionado)
+    {
+        _model.VotoUsuario = votoSelecionado;
+        var votoFilme = new VotoFilme { Voto = votoSelecionado, IdFilme = Id };
+        var responseHttp = await Repository.Post("api/voto", votoFilme);
+        if (responseHttp.Error)
+        {
+            await MostrarMensagem.MostrarMensagemErro("Você já votou antes!");
+        }
+        else
+        {
+            await MostrarMensagem.MostrarMensagemSucesso("Seu voto foi computado!");
+        }
+    }
 
     protected override async Task OnInitializedAsync()
     {

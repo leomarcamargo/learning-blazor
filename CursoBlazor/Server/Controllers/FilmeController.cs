@@ -9,6 +9,7 @@ using CursoBlazor.Shared.DTO;
 using CursoBlazor.Shared.Entidades;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -22,12 +23,14 @@ namespace CursoBlazor.Server.Controllers
         private readonly ApplicationDbContext _db;
         private readonly IArmazenadorArquivo _armazenadorArquivo;
         private readonly IMapper _mapper;
+        private readonly UserManager<IdentityUser> _userManager;
 
-        public FilmeController(ApplicationDbContext db, IArmazenadorArquivo armazenadorArquivo, IMapper mapper)
+        public FilmeController(ApplicationDbContext db, IArmazenadorArquivo armazenadorArquivo, IMapper mapper, UserManager<IdentityUser> userManager)
         {
             _db = db;
             _armazenadorArquivo = armazenadorArquivo;
             _mapper = mapper;
+            _userManager = userManager;
         }
 
         [AllowAnonymous]
@@ -72,8 +75,29 @@ namespace CursoBlazor.Server.Controllers
                 return NotFound();
             }
 
-            var mediaVotos = 4;
-            var votoUsuario = 5;
+            var mediaVotos = 0.0;
+            var votoUsuario = 0;
+
+            if (await _db.VotoFilme.AnyAsync(x => x.IdFilme == id))
+            {
+                mediaVotos = await _db.VotoFilme
+                    .Where(x => x.IdFilme == id)
+                    .AverageAsync(x => x.Voto);
+
+                if (HttpContext.User.Identity.IsAuthenticated)
+                {
+                    var usuario = await _userManager.FindByEmailAsync(HttpContext.User.Identity.Name);
+                    var idUsuario = usuario.Id;
+
+                    var votoUsuarioCadastrado = await _db.VotoFilme
+                        .FirstOrDefaultAsync(x => x.IdFilme == id && x.IdUsuario == idUsuario);
+
+                    if (votoUsuarioCadastrado != null)
+                    {
+                        votoUsuario = votoUsuarioCadastrado.Voto;
+                    }
+                }
+            }
 
             filme.FilmePessoa = filme.FilmePessoa.OrderBy(x => x.Ordem).ToList();
 

@@ -16,6 +16,7 @@ namespace CursoBlazor.Server
         public DbSet<Genero> Genero { get; set; }
         public DbSet<GeneroFilme> GeneroFilme { get; set; }
         public DbSet<Pessoa> Pessoa { get; set; }
+        public DbSet<VotoFilme> VotoFilme { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

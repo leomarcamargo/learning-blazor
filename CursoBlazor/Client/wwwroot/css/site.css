@@ -343,3 +343,7 @@ table > tbody > tr > td {
     text-align: center !important;
     color: #36404a !important
 }
+
+.checked {
+    color: orange;
+}
