@@ -3,6 +3,7 @@
 @inject IRepository Repository
 @inject NavigationManager NavigationManager
 @inject IMostrarMensagem MostrarMensagem
+@attribute [Authorize(Roles = "admin")]
 
 @if (_model == null)
 {
@@ -24,11 +25,11 @@ else
             </div>
         }
     </div>
-    <hr/>
+    <hr />
     <div class="row mt-3">
         <div class="col-md-12">
             <h2 class="font-weight-bold">Filmografia</h2>
-            <ListaFilmes Filmes="_model.Filmes"/>
+            <ListaFilmes Filmes="_model.Filmes" />
         </div>
     </div>
 }

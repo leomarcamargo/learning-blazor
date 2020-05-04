@@ -7,6 +7,8 @@ using CursoBlazor.Server.Helpers;
 using CursoBlazor.Server.Models;
 using CursoBlazor.Shared.DTO;
 using CursoBlazor.Shared.Entidades;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -14,6 +16,7 @@ namespace CursoBlazor.Server.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin")]
     public class FilmeController : ControllerBase
     {
         private readonly ApplicationDbContext _db;
@@ -27,6 +30,7 @@ namespace CursoBlazor.Server.Controllers
             _mapper = mapper;
         }
 
+        [AllowAnonymous]
         public async Task<ActionResult<HomePageDTO>> Get()
         {
             const int limite = 6;
@@ -53,6 +57,7 @@ namespace CursoBlazor.Server.Controllers
         }
 
         [HttpGet("{id}")]
+        [AllowAnonymous]
         public async Task<ActionResult<VisualizarFilmeDTO>> Get(int id)
         {
             var filme = await _db.Filme
@@ -188,6 +193,7 @@ namespace CursoBlazor.Server.Controllers
         }
 
         [HttpGet("filtrar")]
+        [AllowAnonymous]
         public async Task<ActionResult<List<Filme>>> Get([FromQuery] ParametrosPesquisarFilmes parametros)
         {
             var filmesQueryable = _db.Filme.AsQueryable();
@@ -220,35 +226,6 @@ namespace CursoBlazor.Server.Controllers
             var filmes = await filmesQueryable.Paginar(parametros.Paginacao).ToListAsync();
 
             return filmes;
-        }
-
-        [HttpGet("{id}")]
-        public async Task<ActionResult<VisualizarPessoaDTO>> Visualizar(int id)
-        {
-            var pessoa = await _db.Pessoa
-                .Include(x => x.FilmePessoa)
-                .ThenInclude(x => x.Filme)
-                .ThenInclude(x => x.GeneroFilme)
-                .ThenInclude(x => x.Genero)
-                .FirstOrDefaultAsync(x => x.Id == id);
-
-            if (pessoa == null)
-            {
-                return NotFound();
-            }
-
-            var filmes = pessoa.FilmePessoa
-                .OrderByDescending(x => x.Filme.DataLancamento)
-                .Select(x => x.Filme)
-                .ToList();
-
-            var model = new VisualizarPessoaDTO
-            {
-                Pessoa = pessoa,
-                Filmes = filmes
-            };
-
-            return model;
         }
     }
 }

@@ -3,6 +3,8 @@ using System.Threading.Tasks;
 using CursoBlazor.Server.Helpers;
 using CursoBlazor.Shared.DTO;
 using CursoBlazor.Shared.Entidades;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -10,6 +12,7 @@ namespace CursoBlazor.Server.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin")]
     public class GeneroController : ControllerBase
     {
         private readonly ApplicationDbContext _db;

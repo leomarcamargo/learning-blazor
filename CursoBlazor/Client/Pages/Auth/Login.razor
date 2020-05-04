@@ -1,0 +1,50 @@
+﻿@page "/login"
+
+@inject IRepository Repository
+@inject NavigationManager NavigationManager
+@inject ILoginService LoginService
+@inject IMostrarMensagem MostrarMensagem
+
+<h3>Login</h3>
+
+<EditForm Model="@_userInfo" OnValidSubmit="LoginUsuario">
+    <DataAnnotationsValidator />
+
+    <div class="form-group">
+        <label>Email:</label>
+        <div>
+            <InputText Class="form-control" @bind-Value="@_userInfo.Email" />
+            <ValidationMessage For="@(() => _userInfo.Email)" />
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label>Senha:</label>
+        <div>
+            <InputPassword Class="form-control" @bind-Value="@_userInfo.Senha" />
+            <ValidationMessage For="@(() => _userInfo.Senha)" />
+        </div>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Login</button>
+
+</EditForm>
+
+@code {
+    private readonly UserInfo _userInfo = new UserInfo();
+
+    private async Task LoginUsuario()
+    {
+        var httpResponse = await Repository.Post<UserInfo, UserToken>("api/conta/login", _userInfo);
+
+        if (httpResponse.Error)
+        {
+            await MostrarMensagem.MostrarMensagemErro(await httpResponse.GetBody());
+        }
+        else
+        {
+            await LoginService.Login(httpResponse.Response.Token);
+            NavigationManager.NavigateTo("");
+        }
+    }
+}

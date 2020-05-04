@@ -2,6 +2,7 @@
 @inject IRepository Repository
 @inject IMostrarMensagem MostrarMensagem
 @inject NavigationManager NavigationManager
+@attribute [Authorize(Roles = "admin")]
 
 <h3>Atualizar Filme</h3>
 <hr />
@@ -14,7 +15,7 @@ else
 {
     <FormularioFilme OnValidSubmit="Editar"
                      Filme="_filme"
-                     AtoresSelecionados ="_atoresSelecionados"
+                     AtoresSelecionados="_atoresSelecionados"
                      GenerosNaoSelecionados="_generosNaoSelecionados"
                      GenerosSelecionados="_generosSelecionados" />
 }

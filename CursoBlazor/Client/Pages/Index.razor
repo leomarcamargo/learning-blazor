@@ -19,7 +19,14 @@
     protected override async Task OnInitializedAsync()
     {
         var httpResponse = await Repository.Get<HomePageDTO>("api/filme");
-        _emCartaz = httpResponse.Response.EmCartaz;
-        _proximosLancamentos = httpResponse.Response.ProximosLancamentos;
+        if (httpResponse.Error)
+        {
+            Console.WriteLine(httpResponse.HttpResponseMessage.StatusCode);
+        }
+        else
+        {
+            _emCartaz = httpResponse.Response.EmCartaz;
+            _proximosLancamentos = httpResponse.Response.ProximosLancamentos;
+        }
     }
 }

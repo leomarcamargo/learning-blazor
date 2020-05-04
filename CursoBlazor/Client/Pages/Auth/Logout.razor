@@ -1,0 +1,13 @@
+﻿@page "/logout"
+@inject ILoginService LoginService
+@inject NavigationManager NavigationManager
+
+<text>Saindo...</text>
+
+@code {
+    protected override async Task OnInitializedAsync()
+    {
+        await LoginService.Logout();
+        NavigationManager.NavigateTo("");
+    }
+}

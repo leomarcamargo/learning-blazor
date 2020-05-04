@@ -6,6 +6,8 @@ using AutoMapper;
 using CursoBlazor.Server.Helpers;
 using CursoBlazor.Shared.DTO;
 using CursoBlazor.Shared.Entidades;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -13,6 +15,7 @@ namespace CursoBlazor.Server.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin")]
     public class PessoaController : ControllerBase
     {
         private readonly ApplicationDbContext _db;
@@ -26,6 +29,7 @@ namespace CursoBlazor.Server.Controllers
             _mapper = mapper;
         }
 
+        [AllowAnonymous]
         public async Task<ActionResult<List<Pessoa>>> Get([FromQuery] PaginacaoDTO paginacao)
         {
             var queryable = _db.Pessoa.AsQueryable();
