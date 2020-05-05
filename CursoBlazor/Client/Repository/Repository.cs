@@ -4,26 +4,38 @@ using System.Net.Http;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
+using CursoBlazor.Client.Helpers;
 using CursoBlazor.Shared.Entidades;
 
 namespace CursoBlazor.Client.Repository
 {
     public class Repository : IRepository
     {
-        private readonly HttpClient _httpClient;
+        private readonly CustomHttpClientFactory _customHttpClientFactory;
         private JsonSerializerOptions JsonSerializerOptions => new JsonSerializerOptions()
         {
             PropertyNameCaseInsensitive = true
         };
 
-        public Repository(HttpClient httpClient)
+        public Repository(CustomHttpClientFactory customHttpClientFactory)
         {
-            _httpClient = httpClient;
+            _customHttpClientFactory = customHttpClientFactory;
         }
 
-        public async Task<HttpResponseWrapper<T>> Get<T>(string url)
+        private async Task<HttpClient> ObterHttpClient(bool incluirToken = true)
         {
-            var responseHttp = await _httpClient.GetAsync(url);
+            if (incluirToken)
+            {
+                return await _customHttpClientFactory.ObterHTTPClientComToken();
+            }
+
+            return _customHttpClientFactory.ObterHttpClientSemToken();
+        }
+
+        public async Task<HttpResponseWrapper<T>> Get<T>(string url, bool incluirToken = true)
+        {
+            var httpClient = await ObterHttpClient(incluirToken);
+            var responseHttp = await httpClient.GetAsync(url);
             if (responseHttp.IsSuccessStatusCode)
             {
                 var response = await DeserializarResposta<T>(responseHttp, JsonSerializerOptions);
@@ -35,25 +47,28 @@ namespace CursoBlazor.Client.Repository
 
         public async Task<HttpResponseWrapper<object>> Post<T>(string url, T enviar)
         {
+            var httpClient = await ObterHttpClient();
             var enviarJson = JsonSerializer.Serialize(enviar);
             var enviarConteudo = new StringContent(enviarJson, Encoding.UTF8, "application/json");
-            var responseHttp = await _httpClient.PostAsync(url, enviarConteudo);
+            var responseHttp = await httpClient.PostAsync(url, enviarConteudo);
             return new HttpResponseWrapper<object>(null, !responseHttp.IsSuccessStatusCode, responseHttp);
         }
 
         public async Task<HttpResponseWrapper<object>> Put<T>(string url, T enviar)
         {
+            var httpClient = await ObterHttpClient();
             var enviarJson = JsonSerializer.Serialize(enviar);
             var enviarConteudo = new StringContent(enviarJson, Encoding.UTF8, "application/json");
-            var responseHttp = await _httpClient.PutAsync(url, enviarConteudo);
+            var responseHttp = await httpClient.PutAsync(url, enviarConteudo);
             return new HttpResponseWrapper<object>(null, !responseHttp.IsSuccessStatusCode, responseHttp);
         }
 
         public async Task<HttpResponseWrapper<TResponse>> Post<T, TResponse>(string url, T enviar)
         {
+            var httpClient = await ObterHttpClient();
             var enviarJson = JsonSerializer.Serialize(enviar);
             var enviarConteudo = new StringContent(enviarJson, Encoding.UTF8, "application/json");
-            var responseHttp = await _httpClient.PostAsync(url, enviarConteudo);
+            var responseHttp = await httpClient.PostAsync(url, enviarConteudo);
             if (responseHttp.IsSuccessStatusCode)
             {
                 var response = await DeserializarResposta<TResponse>(responseHttp, JsonSerializerOptions);
@@ -65,7 +80,8 @@ namespace CursoBlazor.Client.Repository
 
         public async Task<HttpResponseWrapper<object>> Delete(string url)
         {
-            var respostaHttp = await _httpClient.DeleteAsync(url);
+            var httpClient = await ObterHttpClient();
+            var respostaHttp = await httpClient.DeleteAsync(url);
             return new HttpResponseWrapper<object>(null, !respostaHttp.IsSuccessStatusCode, respostaHttp);
         }
 

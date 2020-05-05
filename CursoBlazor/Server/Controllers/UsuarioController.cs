@@ -3,7 +3,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using CursoBlazor.Server.Helpers;
 using CursoBlazor.Shared.DTO;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -13,7 +12,7 @@ namespace CursoBlazor.Server.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+    [Authorize]
     public class UsuarioController : ControllerBase
     {
         private readonly ApplicationDbContext _db;

@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
 using CursoBlazor.Shared.Entidades;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -24,7 +23,7 @@ namespace CursoBlazor.Server.Controllers
         }
 
         [HttpPost]
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        [Authorize]
         public async Task<ActionResult> Votar(VotoFilme votoFilme)
         {
             var usuario = await _userManager.FindByEmailAsync(HttpContext.User.Identity.Name);

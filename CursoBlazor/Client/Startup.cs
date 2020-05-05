@@ -1,5 +1,4 @@
 using Blazor.FileReader;
-using CursoBlazor.Client.Auth;
 using CursoBlazor.Client.Helpers;
 using CursoBlazor.Client.Repository;
 using Microsoft.AspNetCore.Components.Authorization;
@@ -16,14 +15,10 @@ namespace CursoBlazor.Client
             services.AddTransient<ServicoTransient>();
             services.AddScoped<IRepository, Repository.Repository>();
             services.AddScoped<IMostrarMensagem, MostrarMensagem>();
+            services.AddSingleton<CustomHttpClientFactory>();
+
             services.AddFileReaderService(options => options.InitializeOnFirstCall = true);
-            services.AddAuthorizationCore();
-
-            services.AddScoped<ProvedorAutenticacaoJWT>();
-            services.AddScoped<AuthenticationStateProvider, ProvedorAutenticacaoJWT>(provider => provider.GetRequiredService<ProvedorAutenticacaoJWT>());
-            services.AddScoped<ILoginService, ProvedorAutenticacaoJWT>(provider => provider.GetRequiredService<ProvedorAutenticacaoJWT>());
-
-            services.AddScoped<RenovadorToken>();
+            services.AddApiAuthorization();
         }
 
         public void Configure(IComponentsApplicationBuilder app)

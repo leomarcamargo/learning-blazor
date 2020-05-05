@@ -17,7 +17,7 @@ namespace CursoBlazor.Server.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "admin")]
+    [Authorize(Roles = "admin")]
     public class FilmeController : ControllerBase
     {
         private readonly ApplicationDbContext _db;

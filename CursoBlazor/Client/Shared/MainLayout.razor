@@ -1,5 +1,4 @@
 ﻿@inherits LayoutComponentBase
-@inject RenovadorToken RenovadorToken
 
 <div class="sidebar">
     <NavMenu />
@@ -14,11 +13,3 @@
         @Body
     </div>
 </div>
-
-@code
-{
-    protected override void OnInitialized()
-    {
-        RenovadorToken.Iniciar();
-    }
-}

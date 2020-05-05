@@ -79,7 +79,7 @@ else
 
     protected override async Task OnInitializedAsync()
     {
-        var responseHttp = await Repository.Get<VisualizarFilmeDTO>($"api/filme/{Id}");
+        var responseHttp = await Repository.Get<VisualizarFilmeDTO>($"api/filme/{Id}", incluirToken: false);
         if (responseHttp.Error)
         {
             if (responseHttp.HttpResponseMessage.StatusCode == System.Net.HttpStatusCode.NotFound)
