@@ -10,6 +10,7 @@ namespace CursoBlazor.Shared.DTO
         public Filme Filme { get; set; }
         public List<Genero> Generos { get; set; }
         public List<Pessoa> Atores { get; set; }
+        public List<Sala> Salas { get; set; }
         public int VotoUsuario { get; set; }
         public double MediaVotos { get; set; }
     }

@@ -26,11 +26,11 @@
         <InputMarkdown @bind-Value="@Filme.Resumo" For="@(() => Filme.Resumo)" Label="Resumo"></InputMarkdown>
     </div>
     <div class="form-group">
-        <InputImagem Label="Foto" ImagemSelecionada="ImagemSelecionada"  ImagemTemporaria="@_posterTemporario"/>
+        <InputImagem Label="Foto" ImagemSelecionada="ImagemSelecionada" ImagemTemporaria="@_posterTemporario" />
     </div>
     <div class="form-group">
         <label>Gêneros</label>
-        <SeletorMutiplo Selecionados="Selecionados" NaoSelecionados="NaoSelecionados"/>
+        <SeletorMutiplo Selecionados="ModelGenerosSelecionados" NaoSelecionados="ModelGenerosNaoSelecionados" />
     </div>
     <div class="form-group">
         <label>Atores</label>
@@ -48,6 +48,10 @@
             </SeletorMutiploTypeAhead>
         </div>
     </div>
+    <div class="form-group">
+        <label>Sala de Exibição</label>
+        <SeletorMutiplo Selecionados="ModelSalasSelecionadas" NaoSelecionados="ModelSalasNaoSelecionadas" />
+    </div>
     <button class="btn btn-success" type="submit">Salvar</button>
 </EditForm>
 
@@ -56,17 +60,25 @@
     [Parameter] public EventCallback OnValidSubmit { get; set; }
     [Parameter] public List<Genero> GenerosSelecionados { get; set; } = new List<Genero>();
     [Parameter] public List<Genero> GenerosNaoSelecionados { get; set; } = new List<Genero>();
+    [Parameter] public List<Sala> SalasSelecionadas { get; set; } = new List<Sala>();
+    [Parameter] public List<Sala> SalasNaoSelecionadas { get; set; } = new List<Sala>();
     [Parameter] public List<Pessoa> AtoresSelecionados { get; set; } = new List<Pessoa>();
 
-    private List<SeletorMultiploModel> Selecionados { get; set; } = new List<SeletorMultiploModel>();
-    private List<SeletorMultiploModel> NaoSelecionados { get; set; } = new List<SeletorMultiploModel>();
+    private List<SeletorMultiploModel> ModelGenerosSelecionados { get; set; } = new List<SeletorMultiploModel>();
+    private List<SeletorMultiploModel> ModelGenerosNaoSelecionados { get; set; } = new List<SeletorMultiploModel>();
+
+    private List<SeletorMultiploModel> ModelSalasSelecionadas { get; set; } = new List<SeletorMultiploModel>();
+    private List<SeletorMultiploModel> ModelSalasNaoSelecionadas { get; set; } = new List<SeletorMultiploModel>();
 
     private string _posterTemporario;
 
     protected override void OnInitialized()
     {
-        Selecionados = GenerosSelecionados.Select(x => new SeletorMultiploModel(x.Id.ToString(), x.Nome)).ToList();
-        NaoSelecionados = GenerosNaoSelecionados.Select(x => new SeletorMultiploModel(x.Id.ToString(), x.Nome)).ToList();
+        ModelGenerosSelecionados = GenerosSelecionados.Select(x => new SeletorMultiploModel(x.Id.ToString(), x.Nome)).ToList();
+        ModelGenerosNaoSelecionados = GenerosNaoSelecionados.Select(x => new SeletorMultiploModel(x.Id.ToString(), x.Nome)).ToList();
+
+        ModelSalasSelecionadas = SalasSelecionadas.Select(x => new SeletorMultiploModel(x.Id.ToString(), x.Nome)).ToList();
+        ModelSalasNaoSelecionadas = SalasNaoSelecionadas.Select(x => new SeletorMultiploModel(x.Id.ToString(), x.Nome)).ToList();
         if (!string.IsNullOrWhiteSpace(Filme.Poster))
         {
             _posterTemporario = Filme.Poster;
@@ -87,11 +99,14 @@
 
     private async Task OnDataAnnonationsValidated()
     {
-        Filme.GeneroFilme = Selecionados
+        Filme.GeneroFilme = ModelGenerosSelecionados
             .Select(x => new GeneroFilme { IdGenero = int.Parse(x.Chave) }).ToList();
 
         Filme.FilmePessoa = AtoresSelecionados
             .Select(x => new FilmePessoa { IdPessoa = x.Id, Personagem = x.Personagem }).ToList();
+
+        Filme.SalaFilme = ModelSalasSelecionadas
+            .Select(x => new SalaFilme { IdSala = int.Parse(x.Chave) }).ToList();
 
         if (!string.IsNullOrWhiteSpace(Filme.Poster))
         {

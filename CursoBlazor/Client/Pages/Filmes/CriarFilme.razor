@@ -9,7 +9,10 @@
 
 @if (MostrarFormulario)
 {
-    <FormularioFilme OnValidSubmit="Cadastrar" Filme="_filme" GenerosNaoSelecionados="_generosNaoSelecionados" />
+    <FormularioFilme OnValidSubmit="Cadastrar"
+                     Filme="_filme"
+                     GenerosNaoSelecionados="_generosNaoSelecionados"
+                     SalasNaoSelecionadas="_salasNaoSelecionadas" />
 }
 else
 {
@@ -21,11 +24,15 @@ else
 
     private readonly Filme _filme = new Filme();
     private List<Genero> _generosNaoSelecionados = new List<Genero>();
+    private List<Sala> _salasNaoSelecionadas = new List<Sala>();
 
     protected override async Task OnInitializedAsync()
     {
-        var responseHttp = await Repository.Get<List<Genero>>("api/genero");
-        _generosNaoSelecionados = responseHttp.Response;
+        var responseGeneroHttp = await Repository.Get<List<Genero>>("api/genero");
+        _generosNaoSelecionados = responseGeneroHttp.Response;
+
+        var responseSalaHttp = await Repository.Get<List<Sala>>("api/sala");
+        _salasNaoSelecionadas = responseSalaHttp.Response;
         MostrarFormulario = true;
     }
 

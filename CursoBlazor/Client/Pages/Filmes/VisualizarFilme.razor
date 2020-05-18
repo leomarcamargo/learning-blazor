@@ -22,8 +22,20 @@ else
             @_linkGenero(_model.Generos[i])
         }
     }
-
     @: | <span>@_model.Filme.DataLancamento?.ToShortDateString()</span>
+    @: | SALAS: 
+    for (var i = 0; i < _model.Salas.Count; i++)
+    {
+        if (i < _model.Salas.Count - 1)
+        {
+            @_linkSala(_model.Salas[i])<text>, </text>
+        }
+        else
+        {
+            @_linkSala(_model.Salas[i])
+        }
+    }
+
     @: | Média:  @_model.MediaVotos.ToString("0.#")/5 | Seu voto:
     <Rating PontoMaximo="5" PontoSelecionado="_model.VotoUsuario" OnVote="OnVote"></Rating>
 
@@ -60,7 +72,8 @@ else
     [Parameter] public int Id { get; set; }
     [Parameter] public string Titulo { get; set; }
     private VisualizarFilmeDTO _model;
-    private readonly RenderFragment<Genero> _linkGenero = (genero) =>@<a href="filme/pesquisar?idgenero=@genero.Id">@genero.Nome</a>;
+    private readonly RenderFragment<Genero> _linkGenero = (genero) =>@<a href="filme/pesquisar?generoid=@genero.Id">@genero.Nome</a>;
+    private readonly RenderFragment<Sala> _linkSala = (sala) =>@<a href="filme/pesquisar?salaid=@sala.Id">@sala.Nome</a>;
 
     private async Task OnVote(int votoSelecionado)
     {

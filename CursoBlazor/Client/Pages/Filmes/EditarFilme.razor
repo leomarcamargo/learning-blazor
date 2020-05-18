@@ -17,7 +17,9 @@ else
                      Filme="_filme"
                      AtoresSelecionados="_atoresSelecionados"
                      GenerosNaoSelecionados="_generosNaoSelecionados"
-                     GenerosSelecionados="_generosSelecionados" />
+                     GenerosSelecionados="_generosSelecionados"
+                     SalasNaoSelecionadas="_salasNaoSelecionadas"
+                     SalasSelecionadas="_salasSelecionadas"/>
 }
 
 @code {
@@ -25,6 +27,10 @@ else
     Filme _filme;
     private List<Genero> _generosSelecionados = new List<Genero>();
     private List<Genero> _generosNaoSelecionados = new List<Genero>();
+
+    private List<Sala> _salasSelecionadas = new List<Sala>();
+    private List<Sala> _salasNaoSelecionadas = new List<Sala>();
+
     private List<Pessoa> _atoresSelecionados = new List<Pessoa>();
 
     protected override async Task OnInitializedAsync()
@@ -47,6 +53,8 @@ else
             _atoresSelecionados = modelo.Atores;
             _generosNaoSelecionados = modelo.GenerosNaoSelecionados;
             _generosSelecionados = modelo.GenerosSelecionados;
+            _salasNaoSelecionadas = modelo.SalasNaoSelecionadas;
+            _salasSelecionadas = modelo.SalasSelecionadas;
             _filme = modelo.Filme;
         }
     }

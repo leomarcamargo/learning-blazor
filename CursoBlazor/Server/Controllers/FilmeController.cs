@@ -105,6 +105,7 @@ namespace CursoBlazor.Server.Controllers
             var model = new VisualizarFilmeDTO
             {
                 Filme = filme,
+                Salas = filme.SalaFilme.Select(x => x.Sala).ToList(),
                 Generos = filme.GeneroFilme.Select(x => x.Genero).ToList(),
                 Atores = filme.FilmePessoa.Select(x => new Pessoa
                 {
@@ -133,11 +134,16 @@ namespace CursoBlazor.Server.Controllers
             var idsGenerosSelecionados = filme.Generos.Select(x => x.Id).ToList();
             var generosNaoSelecionados = await _db.Genero.Where(x => !idsGenerosSelecionados.Contains(x.Id)).ToListAsync();
 
+            var idsSalasSelecionadas = filme.Salas.Select(x => x.Id).ToList();
+            var salasNaoSelecionadas = await _db.Sala.Where(x => !idsSalasSelecionadas.Contains(x.Id)).ToListAsync();
+
             var modelo = new AtualizarFilmeDTO
             {
                 Filme = filme.Filme,
                 GenerosNaoSelecionados = generosNaoSelecionados,
                 GenerosSelecionados = filme.Generos,
+                SalasNaoSelecionadas = salasNaoSelecionadas,
+                SalasSelecionadas = filme.Salas,
                 Atores = filme.Atores
             };
 
@@ -185,6 +191,7 @@ namespace CursoBlazor.Server.Controllers
             }
 
             await _db.Database.ExecuteSqlRawAsync($"DELETE FROM GeneroFilme WHERE IdFilme = {filme.Id}");
+            await _db.Database.ExecuteSqlRawAsync($"DELETE FROM SalaFilme WHERE IdFilme = {filme.Id}");
             await _db.Database.ExecuteSqlRawAsync($"DELETE FROM FilmePessoa WHERE IdFilme = {filme.Id}");
 
             if (filme.FilmePessoa != null)
@@ -197,6 +204,7 @@ namespace CursoBlazor.Server.Controllers
 
             filmeCadastrado.FilmePessoa = filme.FilmePessoa;
             filmeCadastrado.GeneroFilme = filme.GeneroFilme;
+            filmeCadastrado.SalaFilme = filme.SalaFilme;
             await _db.SaveChangesAsync();
 
             return NoContent();
@@ -243,7 +251,12 @@ namespace CursoBlazor.Server.Controllers
             {
                 filmesQueryable = filmesQueryable.Where(x => x.GeneroFilme.Any(y => y.IdGenero == parametros.GeneroId));
             }
-            
+
+            if (parametros.SalaId != 0)
+            {
+                filmesQueryable = filmesQueryable.Where(x => x.SalaFilme.Any(y => y.IdSala == parametros.SalaId));
+            }
+
             if (parametros.MaisVotados)
             {
                 filmesQueryable = filmesQueryable.OrderByDescending(f => f.VotoFilme.Average(vf => vf.Voto));

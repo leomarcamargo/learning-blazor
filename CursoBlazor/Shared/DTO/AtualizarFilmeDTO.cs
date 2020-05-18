@@ -11,5 +11,7 @@ namespace CursoBlazor.Shared.DTO
         public List<Pessoa> Atores { get; set; }
         public List<Genero> GenerosSelecionados { get; set; }
         public List<Genero> GenerosNaoSelecionados { get; set; }
+        public List<Sala> SalasNaoSelecionadas { get; set; }
+        public List<Sala> SalasSelecionadas { get; set; }
     }
 }

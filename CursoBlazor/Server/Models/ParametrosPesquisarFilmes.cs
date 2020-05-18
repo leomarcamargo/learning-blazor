@@ -14,6 +14,7 @@ namespace CursoBlazor.Server.Models
             };
         public string Titulo { get; set; }
         public int GeneroId { get; set; }
+        public int SalaId { get; set; }
         public bool EmCartaz { get; set; }
         public bool Estreias { get; set; }
         public bool MaisVotados { get; set; }
