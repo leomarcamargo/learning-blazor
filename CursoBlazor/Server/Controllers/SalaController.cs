@@ -12,19 +12,19 @@ namespace CursoBlazor.Server.Controllers
     [ApiController]
     [Route("api/[controller]")]
     [Authorize(Roles = "admin")]
-    public class GeneroController : ControllerBase
+    public class SalaController : ControllerBase
     {
         private readonly ApplicationDbContext _db;
 
-        public GeneroController(ApplicationDbContext db)
+        public SalaController(ApplicationDbContext db)
         {
             _db = db;
         }
 
         [AllowAnonymous]
-        public async Task<ActionResult<List<Genero>>> Get([FromQuery] PaginacaoDTO paginacao)
+        public async Task<ActionResult<List<Sala>>> Get([FromQuery] PaginacaoDTO paginacao)
         {
-            var queryable = _db.Genero.AsQueryable();
+            var queryable = _db.Sala.AsQueryable();
 
             await HttpContext.InserirParamentroPaginacaoResposta(queryable, paginacao.QuantidadeRegistro);
 
@@ -32,30 +32,30 @@ namespace CursoBlazor.Server.Controllers
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<Genero>> Get(int id)
+        public async Task<ActionResult<Sala>> Get(int id)
         {
-            var genero = await _db.Genero.FirstOrDefaultAsync(x => x.Id == id);
+            var sala = await _db.Sala.FirstOrDefaultAsync(x => x.Id == id);
 
-            if (genero == null)
+            if (sala == null)
             {
                 return NotFound();
             }
 
-            return genero;
+            return sala;
         }
 
         [HttpPost]
-        public async Task<ActionResult<int>> Post(Genero genero)
+        public async Task<ActionResult<int>> Post(Sala sala)
         {
-            _db.Genero.Add(genero);
+            _db.Sala.Add(sala);
             await _db.SaveChangesAsync();
-            return genero.Id;
+            return sala.Id;
         }
 
         [HttpPut]
-        public async Task<ActionResult> Put(Genero genero)
+        public async Task<ActionResult> Put(Sala sala)
         {
-            _db.Attach(genero).State = EntityState.Modified;
+            _db.Attach(sala).State = EntityState.Modified;
             await _db.SaveChangesAsync();
             return NoContent();
         }
@@ -63,13 +63,13 @@ namespace CursoBlazor.Server.Controllers
         [HttpDelete("{id}")]
         public async Task<ActionResult> Delete(int id)
         {
-            var excluir = await _db.Genero.FirstOrDefaultAsync(x => x.Id == id);
+            var excluir = await _db.Sala.FirstOrDefaultAsync(x => x.Id == id);
             if (excluir == null)
             {
                 return NotFound();
             }
 
-            _db.Genero.Remove(excluir);
+            _db.Sala.Remove(excluir);
             await _db.SaveChangesAsync();
 
             return NoContent();

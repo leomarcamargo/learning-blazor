@@ -1,0 +1,80 @@
+﻿@page "/sala"
+@inject IRepository Repository
+@inject IMostrarMensagem MostrarMensagem
+@attribute [Authorize(Roles = "admin")]
+
+<div class="clearfix mb-3">
+    <h3 class="float-left">Salas</h3>
+    <a class="btn btn-primary float-right" href="sala/criar">
+        Cadastrar
+    </a>
+</div>
+
+<ListaGenerica Lista="Salas">
+    <ExisteRegistrosCompleto>
+        <table class="table table-sm table-striped">
+            <thead>
+            <tr>
+                <th>NOME</th>
+                <th>CÓDIGO</th>
+                <th>AÇÕES</th>
+            </tr>
+            </thead>
+            <tbody>
+            @foreach (var sala in Salas)
+            {
+                <tr>
+                    <td>@sala.Nome</td>
+                    <td>@sala.Codigo</td>
+                    <td>
+                        <a href="/sala/editar/@sala.Id" class="btn btn-warning btn-sm">Editar</a> | 
+                        <button class="btn btn-danger btn-sm" @onclick="@(() => ExcluirSala(sala))">Excluir</button>
+                    </td>
+                </tr>
+            }
+            </tbody>
+        </table>
+    </ExisteRegistrosCompleto>
+</ListaGenerica>
+
+<Paginacao PaginaAtual="_paginaAtual" TotalPaginas="_totalPaginas" PaginaSelecionada="PaginaSelecionada" />
+
+@code {
+    public List<Sala> Salas { get; set; }
+    private int _paginaAtual = 1;
+    private int _totalPaginas;
+
+    private async Task PaginaSelecionada(int pagina)
+    {
+        _paginaAtual = pagina;
+        await Carregar(pagina);
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await Carregar();
+    }
+
+    private async Task Carregar(int pagina = 1)
+    {
+        var httpResponse = await Repository.Get<List<Sala>>($"api/sala?pagina={pagina}");
+        if (!httpResponse.Error)
+        {
+            Salas = httpResponse.Response;
+            _totalPaginas = int.Parse(httpResponse.HttpResponseMessage.Headers.GetValues("totalPaginas").FirstOrDefault() ?? string.Empty);
+        }
+    }
+
+    public async Task ExcluirSala(Sala sala)
+    {
+        var responseHttp = await Repository.Delete($"api/sala/{sala.Id}");
+        if (responseHttp.Error)
+        {
+            await MostrarMensagem.MostrarMensagemErro(await responseHttp.GetBody());
+        }
+        else
+        {
+            await Carregar();
+        }
+    }
+}

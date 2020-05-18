@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace CursoBlazor.Shared.Entidades
 {
@@ -9,6 +10,7 @@ namespace CursoBlazor.Shared.Entidades
         public Filme()
         {
             GeneroFilme = new List<GeneroFilme>();
+            SalaFilme = new List<SalaFilme>();
             FilmePessoa = new List<FilmePessoa>();
             VotoFilme = new List<VotoFilme>();
         }
@@ -42,6 +44,7 @@ namespace CursoBlazor.Shared.Entidades
         }
 
         public virtual List<GeneroFilme> GeneroFilme { get; set; }
+        public virtual List<SalaFilme> SalaFilme { get; set; }
         public virtual List<FilmePessoa> FilmePessoa { get; set; }
         public virtual List<VotoFilme> VotoFilme { get; set; }
     }

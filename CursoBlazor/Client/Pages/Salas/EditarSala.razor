@@ -1,0 +1,56 @@
+﻿@page "/sala/editar/{Id:int}"
+@inject IRepository Repository
+@inject IMostrarMensagem MostrarMensagem
+@inject NavigationManager NavigationManager
+@attribute [Authorize(Roles = "admin")]
+
+<h3>Atualizar Sala</h3>
+<hr />
+@if (_sala == null)
+{
+    @: Carregando...
+}
+else
+{
+    <FormularioSala OnValidSubmit="Editar" Sala="_sala" />
+}
+
+
+@code {
+    [Parameter] public int Id { get; set; }
+
+    private Sala _sala;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var httpResponse = await Repository.Get<Sala>($"api/sala/{Id}");
+        if (httpResponse.Error)
+        {
+            if (httpResponse.HttpResponseMessage.StatusCode == System.Net.HttpStatusCode.NotFound)
+            {
+                NavigationManager.NavigateTo("sala");
+            }
+            else
+            {
+                await MostrarMensagem.MostrarMensagemErro(await httpResponse.GetBody());
+            }
+        }
+        else
+        {
+            _sala = httpResponse.Response;
+        }
+    }
+
+    private async Task Editar()
+    {
+        var httpResponse = await Repository.Put("api/sala", _sala);
+        if (httpResponse.Error)
+        {
+            await MostrarMensagem.MostrarMensagemErro(await httpResponse.GetBody());
+        }
+        else
+        {
+            NavigationManager.NavigateTo("sala");
+        }
+    }
+}

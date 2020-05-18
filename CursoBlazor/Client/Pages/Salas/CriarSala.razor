@@ -1,0 +1,28 @@
+﻿@page "/sala/criar"
+@inject IRepository Repository
+@inject NavigationManager Navigation
+@inject IMostrarMensagem MostrarMensagem
+@attribute [Authorize(Roles = "admin")]
+
+<h3>Nova Sala</h3>
+<hr />
+<FormularioSala OnValidSubmit="Cadastrar" Sala="_sala" />
+
+@code {
+    private readonly Sala _sala = new Sala();
+
+    private async Task Cadastrar()
+    {
+        var httpResponse = await Repository.Post("api/sala", _sala);
+        if (httpResponse.Error)
+        {
+            await MostrarMensagem.MostrarMensagemErro(await httpResponse.GetBody());
+        }
+        else
+        {
+            Navigation.NavigateTo("/sala");
+        }
+
+        Console.WriteLine(_sala.Nome);
+    }
+}

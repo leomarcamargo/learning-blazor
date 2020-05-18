@@ -129,6 +129,40 @@ namespace CursoBlazor.Server.Migrations
                     b.ToTable("Pessoa");
                 });
 
+            modelBuilder.Entity("CursoBlazor.Shared.Entidades.Sala", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<string>("Codigo")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Nome")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Sala");
+                });
+
+            modelBuilder.Entity("CursoBlazor.Shared.Entidades.SalaFilme", b =>
+                {
+                    b.Property<int>("IdSala")
+                        .HasColumnType("int");
+
+                    b.Property<int>("IdFilme")
+                        .HasColumnType("int");
+
+                    b.HasKey("IdSala", "IdFilme");
+
+                    b.HasIndex("IdFilme");
+
+                    b.ToTable("SalaFilme");
+                });
+
             modelBuilder.Entity("CursoBlazor.Shared.Entidades.VotoFilme", b =>
                 {
                     b.Property<int>("Id")
@@ -267,7 +301,7 @@ namespace CursoBlazor.Server.Migrations
                         new
                         {
                             Id = "e50e27ce-4792-47fd-87b0-606250021ce0",
-                            ConcurrencyStamp = "74cfbf4c-1ee3-40ba-8044-dfd2ed72a092",
+                            ConcurrencyStamp = "46240cac-b558-4db7-9051-b1548e2e25f6",
                             Name = "admin",
                             NormalizedName = "ADMIN"
                         });
@@ -389,10 +423,12 @@ namespace CursoBlazor.Server.Migrations
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<string>", b =>
                 {
                     b.Property<string>("LoginProvider")
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("nvarchar(128)")
+                        .HasMaxLength(128);
 
                     b.Property<string>("ProviderKey")
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("nvarchar(128)")
+                        .HasMaxLength(128);
 
                     b.Property<string>("ProviderDisplayName")
                         .HasColumnType("nvarchar(max)");
@@ -429,10 +465,12 @@ namespace CursoBlazor.Server.Migrations
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("LoginProvider")
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("nvarchar(128)")
+                        .HasMaxLength(128);
 
                     b.Property<string>("Name")
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("nvarchar(128)")
+                        .HasMaxLength(128);
 
                     b.Property<string>("Value")
                         .HasColumnType("nvarchar(max)");
@@ -472,10 +510,25 @@ namespace CursoBlazor.Server.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("CursoBlazor.Shared.Entidades.SalaFilme", b =>
+                {
+                    b.HasOne("CursoBlazor.Shared.Entidades.Filme", "Filme")
+                        .WithMany("SalaFilme")
+                        .HasForeignKey("IdFilme")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("CursoBlazor.Shared.Entidades.Sala", "Sala")
+                        .WithMany("SalaFilme")
+                        .HasForeignKey("IdSala")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("CursoBlazor.Shared.Entidades.VotoFilme", b =>
                 {
                     b.HasOne("CursoBlazor.Shared.Entidades.Filme", "Filme")
-                        .WithMany()
+                        .WithMany("VotoFilme")
                         .HasForeignKey("IdFilme")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();

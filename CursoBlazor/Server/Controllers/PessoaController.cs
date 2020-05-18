@@ -6,7 +6,6 @@ using AutoMapper;
 using CursoBlazor.Server.Helpers;
 using CursoBlazor.Shared.DTO;
 using CursoBlazor.Shared.Entidades;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;

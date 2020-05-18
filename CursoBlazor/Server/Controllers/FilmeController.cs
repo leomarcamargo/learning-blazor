@@ -7,7 +7,6 @@ using CursoBlazor.Server.Helpers;
 using CursoBlazor.Server.Models;
 using CursoBlazor.Shared.DTO;
 using CursoBlazor.Shared.Entidades;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -64,6 +63,8 @@ namespace CursoBlazor.Server.Controllers
         public async Task<ActionResult<VisualizarFilmeDTO>> Get(int id)
         {
             var filme = await _db.Filme
+                .Include(x => x.SalaFilme)
+                .ThenInclude(x => x.Sala)
                 .Include(x => x.GeneroFilme)
                 .ThenInclude(x => x.Genero)
                 .Include(x => x.FilmePessoa)
