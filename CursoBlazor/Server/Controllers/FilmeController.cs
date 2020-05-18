@@ -104,7 +104,7 @@ namespace CursoBlazor.Server.Controllers
             var model = new VisualizarFilmeDTO
             {
                 Filme = filme,
-                Generos = filme.GeneroFilme.Select( x=> x.Genero).ToList(),
+                Generos = filme.GeneroFilme.Select(x => x.Genero).ToList(),
                 Atores = filme.FilmePessoa.Select(x => new Pessoa
                 {
                     Id = x.IdPessoa,
@@ -112,7 +112,7 @@ namespace CursoBlazor.Server.Controllers
                     Foto = x.Pessoa.Foto,
                     Personagem = x.Personagem
                 }).ToList(),
-                MediaVotos = mediaVotos, 
+                MediaVotos = mediaVotos,
                 VotoUsuario = votoUsuario,
             };
 
@@ -216,8 +216,8 @@ namespace CursoBlazor.Server.Controllers
             return NoContent();
         }
 
-        [HttpGet("filtrar")]
         [AllowAnonymous]
+        [HttpGet("filtrar")]
         public async Task<ActionResult<List<Filme>>> Get([FromQuery] ParametrosPesquisarFilmes parametros)
         {
             var filmesQueryable = _db.Filme.AsQueryable();
@@ -242,8 +242,11 @@ namespace CursoBlazor.Server.Controllers
             {
                 filmesQueryable = filmesQueryable.Where(x => x.GeneroFilme.Any(y => y.IdGenero == parametros.GeneroId));
             }
-
-            //TODO: implementar votação
+            
+            if (parametros.MaisVotados)
+            {
+                filmesQueryable = filmesQueryable.OrderByDescending(f => f.VotoFilme.Average(vf => vf.Voto));
+            }
 
             await HttpContext.InserirParamentroPaginacaoResposta(filmesQueryable, parametros.QuantidadeRegistros);
 

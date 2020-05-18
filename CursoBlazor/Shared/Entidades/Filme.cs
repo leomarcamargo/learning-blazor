@@ -10,6 +10,7 @@ namespace CursoBlazor.Shared.Entidades
         {
             GeneroFilme = new List<GeneroFilme>();
             FilmePessoa = new List<FilmePessoa>();
+            VotoFilme = new List<VotoFilme>();
         }
 
         [Key]
@@ -42,5 +43,6 @@ namespace CursoBlazor.Shared.Entidades
 
         public virtual List<GeneroFilme> GeneroFilme { get; set; }
         public virtual List<FilmePessoa> FilmePessoa { get; set; }
+        public virtual List<VotoFilme> VotoFilme { get; set; }
     }
 }

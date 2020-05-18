@@ -38,8 +38,8 @@
             </div>
 
             <div class="form-group mx-sm-3 mb-2 col-auto">
-                <input type="checkbox" class="form-check-input" id="MaisVotadas" @bind="_maisVotadas" />
-                <label class="form-check-label" for="MaisVotadas">
+                <input type="checkbox" class="form-check-input" id="MaisVotados" @bind="_maisVotados" />
+                <label class="form-check-label" for="MaisVotados">
                     Mais Votadas
                 </label>
             </div>
@@ -66,7 +66,7 @@
     string _generoSelecionado = "0";
     private bool _proximasEstreias;
     private bool _emCartaz;
-    private bool _maisVotadas;
+    private bool _maisVotados;
     private List<Genero> _generos = new List<Genero>();
     public Dictionary<string, string> QueryStringDictionary = new Dictionary<string, string>();
     private int _paginaAtual = 1;
@@ -116,7 +116,7 @@
 
         if (QueryStringDictionary.ContainsKey("maisvotados"))
         {
-            bool.TryParse(QueryStringDictionary["maisvotados"], out _maisVotadas);
+            bool.TryParse(QueryStringDictionary["maisvotados"], out _maisVotados);
         }
 
         if (QueryStringDictionary.ContainsKey("pagina"))
@@ -166,7 +166,7 @@
         QueryStringDictionary["titulo"] = _titulo;
         QueryStringDictionary["emcartaz"] = _emCartaz.ToString();
         QueryStringDictionary["estreias"] = _proximasEstreias.ToString();
-        QueryStringDictionary["maisvotadas"] = _maisVotadas.ToString();
+        QueryStringDictionary["maisvotados"] = _maisVotados.ToString();
         QueryStringDictionary["pagina"] = _paginaAtual.ToString();
 
         var valoresPadroes = new List<string>{"false", "", "0"};
@@ -187,7 +187,7 @@
         _generoSelecionado = "0";
         _proximasEstreias = false;
         _emCartaz = false;
-        _maisVotadas = false;
+        _maisVotados = false;
         _paginaAtual = 1;
         await CarregarFilmes();
     }

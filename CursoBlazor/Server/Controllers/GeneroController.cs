@@ -22,6 +22,7 @@ namespace CursoBlazor.Server.Controllers
             _db = db;
         }
 
+        [AllowAnonymous]
         public async Task<ActionResult<List<Genero>>> Get([FromQuery] PaginacaoDTO paginacao)
         {
             var queryable = _db.Genero.AsQueryable();
